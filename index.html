@@ -1,376 +1,48 @@
-const CONFIG = {
-  ownerName: "BoBo",
-  city: "南京",
-  web3formsAccessKey: "560d39b0-860d-4ee1-946d-85aa699eca66",
-  recipientLabel: "BoBo",
-  recipientEmail: "zhoubobo0724@gmail.com",
-  foods: ["烧烤", "小龙虾", "火锅", "日料", "韩料", "川菜", "湘菜", "西餐", "减脂餐", "创意菜", "其他"],
-  activities: ["看电影", "钓鱼", "散步", "羽毛球", "健身房", "拼豆", "手工", "逛街", "其他"]
-};
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#63c9f3" />
+  <meta name="description" content="BoBo 的夏日快乐小狗约会邀请函" />
+  <title>BoBo 的约会邀请函</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <span class="sun"></span>
+    <span class="cloud cloud-one"></span>
+    <span class="cloud cloud-two"></span>
+    <span class="leaf leaf-one">✦</span>
+    <span class="leaf leaf-two">●</span>
+    <span class="leaf leaf-three">✦</span>
+  </div>
 
-const state = {
-  step: 0,
-  name: "",
-  date: "",
-  time: "",
-  food: "",
-  foodOther: "",
-  activities: [],
-  activityOther: "",
-  note: ""
-};
-
-const card = document.querySelector("#card");
-const progress = document.querySelector("#progress");
-const musicBtn = document.querySelector("#musicBtn");
-const musicIcon = document.querySelector("#musicIcon");
-const musicText = document.querySelector("#musicText");
-const bgm = document.querySelector("#bgm");
-const totalSteps = 6;
-
-function esc(value = "") {
-  return String(value).replace(/[&<>'"]/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    '"': "&quot;"
-  }[char]));
-}
-
-function todayISO() {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 10);
-}
-
-function updateProgress() {
-  progress.innerHTML = Array.from({ length: totalSteps }, (_, index) => {
-    const className = index < state.step ? "done" : index === state.step ? "current" : "";
-    return `<span class="${className}"></span>`;
-  }).join("");
-}
-
-function render() {
-  updateProgress();
-  [renderWelcome, renderName, renderDate, renderFood, renderActivity, renderReview, renderSuccess][state.step]();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function dogArt(extraClass = "") {
-  return `<div class="dog-stage ${extraClass}"><img class="dog-illustration" src="assets/maltese-line-dog.png" alt="正在开心跳舞的线条马尔济斯小狗"></div>`;
-}
-
-function dogMini() {
-  return `<img class="dog-mini" src="assets/maltese-line-dog.png" alt="快乐小狗">`;
-}
-
-function setError(message) {
-  const element = document.querySelector("#error");
-  if (element) element.textContent = message;
-}
-
-function renderWelcome() {
-  card.innerHTML = `
-    <div class="hero-layout">
-      <div class="hero-copy">
-        <span class="eyebrow">BoBo 发来一封夏日邀请</span>
-        <h1>约会<br><span class="highlight">邀请函</span></h1>
-        <p class="sub">我准备了一点蓝天、青草和快乐，想邀请你在南京一起吃好吃的，做点有趣的事。</p>
-        <div class="note-card"><span class="dot"></span><span>不用紧张，跟着快乐小狗选完就好。你的答案会自动发送给 BoBo。</span></div>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <span class="brand-mark">B</span>
+        <div>
+          <strong>BOBO DATE CLUB</strong>
+          <small>南京 · 夏日约会企划</small>
+        </div>
       </div>
-      ${dogArt()}
-    </div>
-    <div class="actions">
-      <button class="btn primary" id="yesBtn">开心打开</button>
-      <button class="btn danger" id="noBtn">我再想想</button>
-    </div>`;
+      <button id="musicBtn" class="music-btn" type="button" aria-label="播放或暂停背景音乐">
+        <span id="musicIcon" class="music-icon">♫</span>
+        <span class="music-copy">
+          <b id="musicText">播放音乐</b>
+          <small>幸福在这里</small>
+        </span>
+      </button>
+    </header>
 
-  document.querySelector("#yesBtn").onclick = () => {
-    state.step = 1;
-    render();
-  };
+    <section class="card" id="card" aria-live="polite"></section>
+    <nav id="progress" class="progress" aria-label="填写进度"></nav>
+  </main>
 
-  const noButton = document.querySelector("#noBtn");
-  let clickCount = 0;
-  noButton.onclick = () => {
-    clickCount += 1;
-    noButton.textContent = ["真的不看看吗", "小狗开始期待了", "再给一次机会", "点左边就好啦"][Math.min(clickCount - 1, 3)];
-    noButton.style.transform = `translate(${(Math.random() - .5) * 52}px, ${(Math.random() - .5) * 18}px)`;
-  };
-}
-
-function renderName() {
-  card.innerHTML = `
-    ${dogMini()}
-    <span class="eyebrow">01 · 认识一下</span>
-    <h2>先告诉我你是谁</h2>
-    <p class="sub">你的名字会出现在最后生成的约会卡里。</p>
-    <div class="field">
-      <label class="label" for="name">你的名字或昵称</label>
-      <input id="name" class="input" maxlength="20" placeholder="例如：小王同学" value="${esc(state.name)}">
-    </div>
-    <p id="error" class="error"></p>
-    <div class="actions">
-      <button class="btn secondary" id="back">返回</button>
-      <button class="btn primary" id="next">继续填写</button>
-    </div>`;
-
-  document.querySelector("#back").onclick = () => { state.step = 0; render(); };
-  document.querySelector("#next").onclick = () => {
-    const value = document.querySelector("#name").value.trim();
-    if (!value) return setError("先留下名字，BoBo 才知道是谁接受了邀请。");
-    state.name = value;
-    state.step = 2;
-    render();
-  };
-}
-
-function renderDate() {
-  card.innerHTML = `
-    ${dogMini()}
-    <span class="eyebrow">02 · 约个时间</span>
-    <h2>${esc(state.name)}，哪天有空？</h2>
-    <p class="sub">约会城市默认是 <b>${CONFIG.city}</b>，具体地点之后再一起商量。</p>
-    <div class="grid-two">
-      <div class="field">
-        <label class="label" for="date">约会日期</label>
-        <input id="date" type="date" min="${todayISO()}" class="input" value="${esc(state.date)}">
-      </div>
-      <div class="field">
-        <label class="label" for="time">大概时间</label>
-        <input id="time" type="time" class="input" value="${esc(state.time)}">
-      </div>
-    </div>
-    <div class="note-card"><span class="dot"></span><span>不用精确到每一分钟，选一个你方便的大概时间就可以。</span></div>
-    <p id="error" class="error"></p>
-    <div class="actions">
-      <button class="btn secondary" id="back">上一步</button>
-      <button class="btn primary" id="next">选吃什么</button>
-    </div>`;
-
-  document.querySelector("#back").onclick = () => { state.step = 1; render(); };
-  document.querySelector("#next").onclick = () => {
-    const date = document.querySelector("#date").value;
-    const time = document.querySelector("#time").value;
-    if (!date || !time) return setError("日期和时间都要选哦。");
-    state.date = date;
-    state.time = time;
-    state.step = 3;
-    render();
-  };
-}
-
-function renderFood() {
-  card.innerHTML = `
-    ${dogMini()}
-    <span class="eyebrow">03 · 吃点什么</span>
-    <h2>约会先从好吃的开始</h2>
-    <p class="sub">先选一个你现在最想吃的，选择困难也没关系。</p>
-    <div class="choices">
-      ${CONFIG.foods.map(food => `<button class="choice ${state.food === food ? "selected" : ""}" data-value="${food}">${food}</button>`).join("")}
-    </div>
-    <div class="field ${state.food === "其他" ? "" : "hidden"}" id="otherBox">
-      <label class="label" for="foodOther">你想吃什么？</label>
-      <input id="foodOther" class="input" maxlength="30" value="${esc(state.foodOther)}" placeholder="写下你的答案">
-    </div>
-    <p id="error" class="error"></p>
-    <div class="actions">
-      <button class="btn secondary" id="back">上一步</button>
-      <button class="btn primary" id="next">选约会项目</button>
-    </div>`;
-
-  document.querySelectorAll(".choice").forEach(button => {
-    button.onclick = () => {
-      state.food = button.dataset.value;
-      renderFood();
-    };
-  });
-  document.querySelector("#back").onclick = () => { state.step = 2; render(); };
-  document.querySelector("#next").onclick = () => {
-    if (!state.food) return setError("先选一个最想吃的。");
-    if (state.food === "其他") {
-      const value = document.querySelector("#foodOther").value.trim();
-      if (!value) return setError("写下你想吃的东西吧。");
-      state.foodOther = value;
-    }
-    state.step = 4;
-    render();
-  };
-}
-
-function renderActivity() {
-  card.innerHTML = `
-    ${dogMini()}
-    <span class="eyebrow">04 · 一起玩什么</span>
-    <h2>想一起做什么？</h2>
-    <p class="sub">这一页可以多选，快乐当然越多越好。</p>
-    <div class="choices">
-      ${CONFIG.activities.map(activity => `<button class="choice ${state.activities.includes(activity) ? "selected" : ""}" data-value="${activity}">${activity}</button>`).join("")}
-    </div>
-    <div class="field ${state.activities.includes("其他") ? "" : "hidden"}">
-      <label class="label" for="activityOther">其他项目</label>
-      <input id="activityOther" class="input" maxlength="40" value="${esc(state.activityOther)}" placeholder="例如：去公园喂鸭子">
-    </div>
-    <div class="field">
-      <label class="label" for="note">还有什么想对 BoBo 说？</label>
-      <textarea id="note" class="textarea" maxlength="200" placeholder="时间调整、忌口、想去的店，都可以写在这里">${esc(state.note)}</textarea>
-    </div>
-    <p id="error" class="error"></p>
-    <div class="actions">
-      <button class="btn secondary" id="back">上一步</button>
-      <button class="btn primary" id="next">生成约会卡</button>
-    </div>`;
-
-  document.querySelectorAll(".choice").forEach(button => {
-    button.onclick = () => {
-      const value = button.dataset.value;
-      state.activities = state.activities.includes(value)
-        ? state.activities.filter(item => item !== value)
-        : [...state.activities, value];
-      renderActivity();
-    };
-  });
-  document.querySelector("#back").onclick = () => { state.step = 3; render(); };
-  document.querySelector("#next").onclick = () => {
-    if (!state.activities.length) return setError("至少选一个约会项目。");
-    if (state.activities.includes("其他")) {
-      const value = document.querySelector("#activityOther").value.trim();
-      if (!value) return setError("写下其他约会项目吧。");
-      state.activityOther = value;
-    }
-    state.note = document.querySelector("#note").value.trim();
-    state.step = 5;
-    render();
-  };
-}
-
-function effectiveFood() {
-  return state.food === "其他" ? state.foodOther : state.food;
-}
-
-function effectiveActivities() {
-  return state.activities.map(item => item === "其他" ? state.activityOther : item).join("、");
-}
-
-function renderReview() {
-  card.innerHTML = `
-    ${dogMini()}
-    <span class="eyebrow">05 · 最终确认</span>
-    <h2>我们的约会计划</h2>
-    <p class="sub">小狗已经把答案整理好啦，确认无误就可以发送给 BoBo。</p>
-    <div class="summary">
-      <p><strong>邀请人</strong><span>${CONFIG.ownerName}</span></p>
-      <p><strong>赴约人</strong><span>${esc(state.name)}</span></p>
-      <p><strong>城市</strong><span>${CONFIG.city}</span></p>
-      <p><strong>日期</strong><span>${esc(state.date)}</span></p>
-      <p><strong>时间</strong><span>${esc(state.time)}</span></p>
-      <p><strong>吃什么</strong><span>${esc(effectiveFood())}</span></p>
-      <p><strong>做什么</strong><span>${esc(effectiveActivities())}</span></p>
-      <p><strong>其他想法</strong><span>${esc(state.note || "暂无")}</span></p>
-    </div>
-    <p id="error" class="error"></p>
-    <div class="actions">
-      <button class="btn secondary" id="back">再改一下</button>
-      <button class="btn primary" id="submit">确认赴约！</button>
-    </div>
-    <p class="tiny">点击确认后，结果会通过 Web3Forms 自动发送到 BoBo 绑定的邮箱。</p>`;
-
-  document.querySelector("#back").onclick = () => { state.step = 4; render(); };
-  document.querySelector("#submit").onclick = submitInvitation;
-}
-
-function resultText() {
-  return `BoBo 的约会邀请确认\n赴约人：${state.name}\n城市：${CONFIG.city}\n日期：${state.date}\n时间：${state.time}\n餐食：${effectiveFood()}\n项目：${effectiveActivities()}\n其他想法：${state.note || "暂无"}`;
-}
-
-async function submitInvitation() {
-  const button = document.querySelector("#submit");
-  button.disabled = true;
-  button.textContent = "正在发送…";
-
-  if (!CONFIG.web3formsAccessKey) {
-    await navigator.clipboard?.writeText(resultText()).catch(() => {});
-    state.step = 6;
-    renderSuccess(false);
-    return;
-  }
-
-  try {
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        access_key: CONFIG.web3formsAccessKey,
-        subject: `${state.name} 接受了 BoBo 的约会邀请`,
-        from_name: "BoBo 夏日约会邀请函",
-        name: state.name,
-        city: CONFIG.city,
-        date: state.date,
-        time: state.time,
-        food: effectiveFood(),
-        activities: effectiveActivities(),
-        note: state.note || "暂无"
-      })
-    });
-    const data = await response.json();
-    if (!data.success) throw new Error(data.message || "发送失败");
-    state.step = 6;
-    renderSuccess(true);
-  } catch (error) {
-    await navigator.clipboard?.writeText(resultText()).catch(() => {});
-    state.step = 6;
-    renderSuccess(false);
-  }
-}
-
-function renderSuccess(sent) {
-  updateProgress();
-  card.innerHTML = `
-    <span class="success-badge">✓ ${sent ? "已发送给 BoBo" : "约会卡已生成"}</span>
-    <div class="confetti">✦ ● ✦</div>
-    <div class="success-stage">${dogArt()}</div>
-    <h2>${esc(state.name)}，收到你的答案啦！</h2>
-    <p class="sub">快乐小狗已经开始期待这次约会。${sent ? "BoBo 会收到完整安排。" : "结果已尽量复制到剪贴板，请把它发给 BoBo。"}</p>
-    <div class="summary">
-      <p><strong>日期时间</strong><span>${esc(state.date)} ${esc(state.time)}</span></p>
-      <p><strong>吃什么</strong><span>${esc(effectiveFood())}</span></p>
-      <p><strong>做什么</strong><span>${esc(effectiveActivities())}</span></p>
-    </div>
-    <div class="actions">
-      <button class="btn secondary" id="copy">复制约会内容</button>
-      <button class="btn primary" id="again">重新填写</button>
-    </div>`;
-
-  document.querySelector("#copy").onclick = async () => {
-    await navigator.clipboard.writeText(resultText());
-    document.querySelector("#copy").textContent = "已复制 ✓";
-  };
-  document.querySelector("#again").onclick = () => location.reload();
-}
-
-musicBtn.onclick = async () => {
-  try {
-    if (bgm.paused) {
-      await bgm.play();
-      musicBtn.classList.add("playing");
-      musicIcon.textContent = "Ⅱ";
-      musicText.textContent = "暂停音乐";
-    } else {
-      bgm.pause();
-      musicBtn.classList.remove("playing");
-      musicIcon.textContent = "♫";
-      musicText.textContent = "播放音乐";
-    }
-  } catch (error) {
-    alert("音乐暂时无法播放，请刷新页面后再点击右上角的音乐按钮。");
-  }
-};
-
-bgm.addEventListener("ended", () => {
-  musicBtn.classList.remove("playing");
-  musicIcon.textContent = "♫";
-  musicText.textContent = "播放音乐";
-});
-
-render();
+  <audio id="bgm" loop preload="metadata">
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+  <script src="app.js" defer></script>
+</body>
+</html>

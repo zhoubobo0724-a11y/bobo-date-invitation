@@ -1,0 +1,18 @@
+GitHub Pages 修正版（文件全部在同一层）
+
+解压后，你会直接看到：
+1. index.html
+2. styles.css
+3. app.js
+4. maltese-line-dog.png
+5. music.mp3
+
+上传时请把以上 5 个文件直接上传到 GitHub 仓库根目录。
+不要上传 ZIP 压缩包；不要改文件名；不要把 app.js 的内容放进 index.html。
+
+仓库首页应直接显示这 5 个文件。
+随后进入 Settings → Pages：
+Source：Deploy from a branch
+Branch：main
+Folder：/(root)
+点击 Save，等待 1–3 分钟，再打开网页并按 Ctrl+F5 刷新。
